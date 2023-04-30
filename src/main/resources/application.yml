@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/authentication
+    url: jdbc:postgresql://localhost:5432/jwt_auth
     username: admin
     password: password
     driver-class-name: org.postgresql.Driver
@@ -13,4 +13,7 @@ spring:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  sql:
+    init:
+      mode: always
 
