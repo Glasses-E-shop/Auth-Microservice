@@ -1,0 +1,32 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: jwt_security
+    networks:
+      - ochelari_network
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+
+  backend:
+    image: spring-docker
+    ports:
+      - "8080:8080"
+    networks:
+      - ochelari_network
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/jwt_security
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+      - SPRING_JPA_SHOW_SQL=true
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+
+networks:
+  ochelari_network:
+    driver: bridge
