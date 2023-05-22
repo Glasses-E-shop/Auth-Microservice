@@ -10,6 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -34,18 +36,19 @@ public class AuthenticationService {
                 .build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request){
-       authenticationManager.authenticate(
-               new UsernamePasswordAuthenticationToken(
-                       request.getEmail(),
-                       request.getPassword()
-               )
-       );
-       var user = repository.findByEmail(request.getEmail())
-               .orElseThrow();
-       var jwtToken = jwtService.generateTokenNoExtraClaims(user);
-       return AuthenticationResponse.builder()
-                .token(jwtToken)
+    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        Optional<User> user = repository.findByEmail(request.getEmail());
+        if (user.isPresent()) {
+            User aux = user.get();
+            if (passwordEncoder.matches(request.getPassword(), aux.getPassword())) {
+                var jwtToken = jwtService.generateTokenNoExtraClaims(aux);
+                return AuthenticationResponse.builder()
+                        .token(jwtToken)
+                        .build();
+            }
+        }
+        return AuthenticationResponse.builder()
+                .token("Denied")
                 .build();
     }
 }
